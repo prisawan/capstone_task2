@@ -1,0 +1,23 @@
+- name: Configure Nginx on AWS and Azure
+  hosts: all
+  become: 'yes'
+  tasks:
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: 'yes'
+    - name: Ensure Nginx is running and enabled
+      service:
+        name: nginx
+        state: started
+        enabled: 'yes'
+    - name: Verify Nginx welcome page
+      uri:
+        url: 'http://{{ ansible_host }}'
+        return_content: 'yes'
+      register: nginx_response
+    - name: Check welcome text
+      assert:
+        that:
+          - '''Welcome to nginx!'' in nginx_response.content'
